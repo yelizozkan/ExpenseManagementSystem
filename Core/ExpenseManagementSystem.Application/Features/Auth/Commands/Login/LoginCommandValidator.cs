@@ -7,8 +7,13 @@ namespace ExpenseManagementSystem.Application.Features.Auth.Commands.Login
     {
         public LoginCommandValidator()
         {
-            RuleFor(x => x.Model.Email).NotEmpty().EmailAddress();
-            RuleFor(x => x.Model.Password).NotEmpty().MinimumLength(6);
+            RuleFor(x => x.Model.Email)
+                .NotEmpty()
+                .EmailAddress();
+
+            RuleFor(x => x.Model.Password)
+                .NotEmpty()
+                .MinimumLength(6);
         }
     }
 }

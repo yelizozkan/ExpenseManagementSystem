@@ -1,5 +1,4 @@
 ﻿using ExpenseManagementSystem.Application.Abstractions.Token;
-using ExpenseManagementSystem.Application.Dtos;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
@@ -7,7 +6,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using ExpenseManagementSystem.Domain.Identity;
+using ExpenseManagementSystem.Domain.Entities.Identity;
+using ExpenseManagementSystem.Application.Dtos.Auth;
 
 
 namespace ExpenseManagementSystem.Infrastructure.Services.Token

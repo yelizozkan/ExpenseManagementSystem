@@ -2,12 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using ExpenseManagementSystem.Persistence.Contexts;
 using ExpenseManagementSystem.API.Middlewares;
 using ExpenseManagementSystem.Persistence;
-using ExpenseManagementSystem.Domain.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using ExpenseManagementSystem.Application;
+using ExpenseManagementSystem.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ExpenseManagementSystem.Domain.Entities.Identity;
+using ExpenseManagementSystem.Application.Abstractions.Services;
+using ExpenseManagementSystem.Persistence.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,11 +64,46 @@ builder.Services.AddAuthentication(options =>
 });
 
 
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new() { Title = "ExpenseManagementSystem.API", Version = "v1" });
+
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGci...\""
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+
+
 builder.Services.AddApplicationServices();
-builder.Services.AddPersistenceServices();
+builder.Services.AddInfrastructureServices();
 builder.Services.AddPersistenceServices();
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
 
 var app = builder.Build();

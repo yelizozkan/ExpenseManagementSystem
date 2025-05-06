@@ -1,5 +1,4 @@
-﻿
-namespace ExpenseManagementSystem.Application.Dtos.Auth
+﻿namespace ExpenseManagementSystem.Application.Dtos.Auth
 {
     public class LoginRequestDto
     {

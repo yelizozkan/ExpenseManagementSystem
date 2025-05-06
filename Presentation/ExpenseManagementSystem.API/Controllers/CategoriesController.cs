@@ -4,7 +4,6 @@ using ExpenseManagementSystem.Application.Features.Categories.Commands.DeleteCat
 using ExpenseManagementSystem.Application.Features.Categories.Commands.UpdateCategory;
 using ExpenseManagementSystem.Application.Features.Categories.Queries.GetAllCategories;
 using ExpenseManagementSystem.Application.Features.Categories.Queries.GetCategoryById;
-using ExpenseManagementSystem.Application.Features.Categories.Queries.GetCategoryByParameter;
 using ExpenseManagementSystem.Application.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +13,7 @@ namespace ExpenseManagementSystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -25,7 +25,7 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpGet("GetAll")]
-        //[Authorize(Roles = "admin,user")]
+        [Authorize(Roles = "Admin,Personnel")]
         public async Task<ApiResponse<List<CategoryResponseDto>>> GetAll()
         {
             var query = new GetAllCategoriesQuery();
@@ -35,7 +35,7 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpGet("GetById/{id}")]
-        //[Authorize(Roles = "admin,user")]
+        [Authorize(Roles = "Admin,Personnel")]
         public async Task<ApiResponse<CategoryResponseDto>> GetById([FromRoute] long id)
         {
             var query = new GetCategoryByIdQuery(id);
@@ -44,23 +44,8 @@ namespace ExpenseManagementSystem.API.Controllers
         }
 
 
-        [HttpGet("ByParameters")]
-        //[Authorize(Roles = "admin,user")]
-        public async Task<ApiResponse<List<CategoryResponseDto>>> GetByParameters([FromQuery] string? name, [FromQuery] bool? isActive)
-        {
-            var query = new GetCategoriesByParameterQuery(new GetCategoriesByParameterRequestDto
-            {
-                Name = name,
-                IsActive = isActive
-            });
-
-            var result = await _mediator.Send(query);
-            return new ApiResponse<List<CategoryResponseDto>>(result);
-        }
-
-
         [HttpPost]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ApiResponse<CategoryResponseDto>> Post([FromBody] CategoryRequestDto category)
         {
             var command = new CreateCategoryCommand(category);
@@ -70,7 +55,7 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpPut("{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ApiResponse> Put([FromRoute] long id, [FromBody] CategoryRequestDto category)
         {
             await _mediator.Send(new UpdateCategoryCommand(id, category));
@@ -79,7 +64,7 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ApiResponse> Delete([FromRoute] long id)
         {
             var result = await _mediator.Send(new DeleteCategoryCommand(id));

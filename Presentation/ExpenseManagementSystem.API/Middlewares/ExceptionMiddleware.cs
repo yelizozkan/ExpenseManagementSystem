@@ -26,6 +26,22 @@ namespace ExpenseManagementSystem.API.Middlewares
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, ex);
+                return; // exception sonrası yazmaya devam etme
+            }
+
+            if (context.Response.StatusCode == (int)HttpStatusCode.Forbidden)
+            {
+                context.Response.ContentType = "application/json";
+                var response = new ApiResponse("Bu işlemi yapmak için yetkiniz yok.");
+                var json = JsonSerializer.Serialize(response);
+                await context.Response.WriteAsync(json);
+            }
+            else if (context.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
+            {
+                context.Response.ContentType = "application/json";
+                var response = new ApiResponse("Kimlik doğrulaması gerekli.");
+                var json = JsonSerializer.Serialize(response);
+                await context.Response.WriteAsync(json);
             }
         }
 

@@ -1,11 +1,7 @@
 ﻿using ExpenseManagementSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ExpenseManagementSystem.Persistence.Configurations
 {
@@ -15,20 +11,20 @@ namespace ExpenseManagementSystem.Persistence.Configurations
         {
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.PaymentMethod)
+            builder.Property(x => x.PaymentDate)
+                .IsRequired();
+
+            builder.Property(x => x.Amount)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasColumnType("decimal(18,2)");
 
             builder.Property(x => x.TargetIban)
                 .IsRequired()
                 .HasMaxLength(26);
 
-            builder.Property(x => x.TransactionReference)
-                .HasMaxLength(100);
-
-            builder.HasOne(x => x.Expense)
+            builder.HasOne(x => x.Expenditure)
                 .WithOne(x => x.Payment)
-                .HasForeignKey<Payment>(x => x.ExpenseId)
+                .HasForeignKey<Payment>(x => x.ExpenditureId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

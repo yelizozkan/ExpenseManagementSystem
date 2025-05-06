@@ -1,13 +1,13 @@
-﻿using ExpenseManagementSystem.Application.Dtos;
-using ExpenseManagementSystem.Application.Dtos.Auth;
+﻿using ExpenseManagementSystem.Application.Dtos.Auth;
+using ExpenseManagementSystem.Application.Responses;
 
 namespace ExpenseManagementSystem.Application.Abstractions.Services
 {
     public interface IAuthService
     {
-        Task<TokenDto> LoginAsync(string email, string password);
-        Task<TokenDto> RegisterAsync(RegisterRequestDto model);
-        Task<TokenDto> RefreshTokenLoginAsync(string refreshToken);
+        Task<ApiResponse<TokenDto>> LoginAsync(LoginRequestDto model);
+        Task<ApiResponse<TokenDto>> RegisterAsync(RegisterRequestDto model);
+        Task<ApiResponse<TokenDto>> RefreshTokenLoginAsync(RefreshTokenRequestDto  model);
 
     }
 }

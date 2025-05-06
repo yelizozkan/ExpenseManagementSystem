@@ -1,11 +1,10 @@
 ﻿using ExpenseManagementSystem.Application.Abstractions.Services;
 using ExpenseManagementSystem.Application.Abstractions.Token;
-using ExpenseManagementSystem.Application.Dtos;
 using ExpenseManagementSystem.Application.Dtos.Auth;
-using ExpenseManagementSystem.Domain.Identity;
+using ExpenseManagementSystem.Application.Responses;
+using ExpenseManagementSystem.Domain.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
 
 
 namespace ExpenseManagementSystem.Persistence.Services
@@ -16,91 +15,78 @@ namespace ExpenseManagementSystem.Persistence.Services
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenHandler _tokenHandler;
 
-        public AuthService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenHandler tokenHandler)
+        public AuthService(
+            UserManager<AppUser> userManager,
+            SignInManager<AppUser> signInManager,
+            ITokenHandler tokenHandler)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenHandler = tokenHandler;
         }
 
-        public async Task<TokenDto> LoginAsync(string email, string password)
+        public async Task<ApiResponse<TokenDto>> LoginAsync(LoginRequestDto model)
         {
-            var user = await _userManager.FindByEmailAsync(email)
-                       ?? throw new UnauthorizedAccessException("Kullanıcı bulunamadı");
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return new ApiResponse<TokenDto>("Kullanıcı bulunamadı");
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (!result.Succeeded)
-                throw new UnauthorizedAccessException("Şifre hatalı");
+                return new ApiResponse<TokenDto>("Şifre hatalı");
 
-            var token = await _tokenHandler.CreateAccessTokenAsync(user);
-            await UpdateRefreshTokenAsync(user, token);
-
-            return token;
+            var token = await GenerateAndAssignTokenAsync(user);
+            return new ApiResponse<TokenDto>(token);
         }
 
-        public async Task<TokenDto> RegisterAsync(RegisterRequestDto model)
-        {
-            var user = await CreateAndValidateUser(model);
-            await AssignRoleIfGiven(user, model.Role);
-
-            var token = await _tokenHandler.CreateAccessTokenAsync(user);
-            await UpdateRefreshTokenAsync(user, token);
-
-            return token;
-        }
-
-        private async Task<AppUser> CreateAndValidateUser(RegisterRequestDto model)
+        public async Task<ApiResponse<TokenDto>> RegisterAsync(RegisterRequestDto dto)
         {
             var user = new AppUser
             {
-                UserName = model.Email,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName
+                UserName = Guid.NewGuid().ToString(), 
+                Email = dto.Email,
+                FirstName = dto.FirstName,
+                LastName = dto.LastName
             };
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var result = await _userManager.CreateAsync(user, dto.Password);
+
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception($"Kullanıcı oluşturulamadı: {errors}");
+                var errorMessage = string.Join(", ", result.Errors.Select(e => e.Description));
+                return new ApiResponse<TokenDto>(errorMessage);
             }
 
-            return user;
+            await _userManager.AddToRoleAsync(user, "Personnel");
+
+            var token = await GenerateAndAssignTokenAsync(user);
+            return new ApiResponse<TokenDto>(token);
         }
 
-        private async Task AssignRoleIfGiven(AppUser user, string role)
+        public async Task<ApiResponse<TokenDto>> RefreshTokenLoginAsync(RefreshTokenRequestDto model)
         {
-            if (!string.IsNullOrWhiteSpace(role))
-            {
-                var roleExists = await _userManager.IsInRoleAsync(user, role);
-                if (!roleExists)
-                    await _userManager.AddToRoleAsync(user, role);
-            }
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.RefreshToken == model.RefreshToken);
+
+            if (user == null || user.RefreshTokenEndDate <= DateTime.UtcNow)
+                return new ApiResponse<TokenDto>("Refresh token geçersiz veya süresi dolmuş.");
+
+            var token = await GenerateAndAssignTokenAsync(user);
+            return new ApiResponse<TokenDto>(token);
         }
 
+        private async Task<TokenDto> GenerateAndAssignTokenAsync(AppUser user)
+        {
+            var token = await _tokenHandler.CreateAccessTokenAsync(user);
+            await UpdateRefreshTokenAsync(user, token);
+            return token;
+        }
 
         private async Task UpdateRefreshTokenAsync(AppUser user, TokenDto token)
         {
             user.RefreshToken = token.RefreshToken;
-            user.RefreshTokenEndDate = token.Expiration.AddDays(7); 
+            user.RefreshTokenEndDate = token.Expiration.AddDays(7);
             await _userManager.UpdateAsync(user);
         }
-
-        public async Task<TokenDto> RefreshTokenLoginAsync(string refreshToken)
-        {
-            var user = await _userManager.Users
-                .FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
-
-            if (user == null || user.RefreshTokenEndDate <= DateTime.UtcNow)
-                throw new UnauthorizedAccessException("Geçersiz veya süresi dolmuş refresh token.");
-
-            var token = await _tokenHandler.CreateAccessTokenAsync(user);
-            await UpdateRefreshTokenAsync(user, token); 
-
-            return token;
-        }
-
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using ExpenseManagementSystem.Application.Abstractions.Repository;
-using ExpenseManagementSystem.Application.Abstractions.Services;
+﻿using ExpenseManagementSystem.Application.Abstractions.Services;
 using ExpenseManagementSystem.Application.Dtos.Category;
 using MediatR;
 

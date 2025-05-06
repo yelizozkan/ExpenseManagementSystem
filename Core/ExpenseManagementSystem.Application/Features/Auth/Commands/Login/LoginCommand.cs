@@ -1,11 +1,10 @@
 ﻿using ExpenseManagementSystem.Application.Dtos.Auth;
-using ExpenseManagementSystem.Application.Dtos;
+using ExpenseManagementSystem.Application.Responses;
 using MediatR;
-
 
 namespace ExpenseManagementSystem.Application.Features.Auth.Commands.Login
 {
-    public class LoginCommand : IRequest<TokenDto>
+    public class LoginCommand : IRequest<ApiResponse<TokenDto>>
     {
         public LoginRequestDto Model { get; set; }
 

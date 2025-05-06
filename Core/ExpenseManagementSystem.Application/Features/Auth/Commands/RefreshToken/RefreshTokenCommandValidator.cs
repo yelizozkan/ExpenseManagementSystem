@@ -6,7 +6,8 @@ namespace ExpenseManagementSystem.Application.Features.Auth.Commands.RefreshToke
     {
         public RefreshTokenCommandValidator()
         {
-            RuleFor(x => x.Model.RefreshToken).NotEmpty();
+            RuleFor(x => x.Model.RefreshToken)
+                .NotEmpty();
         }
     }
 }

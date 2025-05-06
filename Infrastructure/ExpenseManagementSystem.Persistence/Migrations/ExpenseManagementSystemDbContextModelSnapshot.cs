@@ -67,6 +67,44 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories", "table");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            CreatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 339, DateTimeKind.Utc).AddTicks(8656),
+                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            Description = "Business travel and transportation",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Travel",
+                            UpdatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 339, DateTimeKind.Utc).AddTicks(8660),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            CreatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 339, DateTimeKind.Utc).AddTicks(8667),
+                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            Description = "Food and beverages during work",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Meals",
+                            UpdatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 339, DateTimeKind.Utc).AddTicks(8667),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            CreatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 339, DateTimeKind.Utc).AddTicks(8670),
+                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            Description = "Stationery and work materials",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Office Supplies",
+                            UpdatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 339, DateTimeKind.Utc).AddTicks(8670),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                        });
                 });
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Expenditure", b =>
@@ -78,7 +116,7 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long>("CategoryId")
                         .HasColumnType("bigint");
@@ -105,8 +143,14 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<bool?>("IsApprovedForPayment")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<long?>("PaymentId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("ReceiptFilePath")
                         .IsRequired()
@@ -119,7 +163,7 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<decimal>("TaxAmount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long?>("UpdatedBy")
                         .HasColumnType("bigint");
@@ -157,6 +201,9 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.Property<long?>("ApprovedById")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("CategoryId")
+                        .HasColumnType("bigint");
+
                     b.Property<long?>("CreatedBy")
                         .HasColumnType("bigint");
 
@@ -176,9 +223,6 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<long?>("PaymentId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("StatusId")
                         .HasColumnType("bigint");
 
@@ -186,7 +230,7 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long?>("UpdatedBy")
                         .HasColumnType("bigint");
@@ -203,6 +247,8 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApprovedById");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("StatusId");
 
@@ -232,9 +278,6 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("character varying(250)");
 
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -258,6 +301,221 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ExpenseStatuses", "table");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            CreatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 227, DateTimeKind.Utc).AddTicks(6420),
+                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            Description = "Expense is waiting for approval",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Pending",
+                            UpdatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 227, DateTimeKind.Utc).AddTicks(6428),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            CreatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 227, DateTimeKind.Utc).AddTicks(6435),
+                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            Description = "Expense has been approved",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Approved",
+                            UpdatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 227, DateTimeKind.Utc).AddTicks(6435),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            CreatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 227, DateTimeKind.Utc).AddTicks(6437),
+                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            Description = "Expense has been rejected",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Name = "Rejected",
+                            UpdatedDate = new DateTime(2025, 5, 5, 16, 34, 55, 227, DateTimeKind.Utc).AddTicks(6437),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                        });
+                });
+
+            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Identity.AppRole", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("Roles", "table");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Name = "Personnel",
+                            NormalizedName = "PERSONNEL"
+                        });
+                });
+
+            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DepartmentName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Iban")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Position")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RefreshTokenEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("Users", "table");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "b6dd6011-f643-4134-93b8-16956865686a",
+                            DepartmentName = "Management",
+                            Email = "admin@company.com",
+                            EmailConfirmed = true,
+                            FirstName = "System",
+                            Iban = "TR000000000000000000000000",
+                            LastName = "Administrator",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@COMPANY.COM",
+                            NormalizedUserName = "ADMIN@COMPANY.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOwoa/47YTsQEcY42OI2VPe4FAGjiKE5N+LtJ2EBrknznU9wiyKyyrPePtO6j9dL0Q==",
+                            PhoneNumberConfirmed = false,
+                            Position = "Admin",
+                            SecurityStamp = "d9b63c9b-4207-4011-b378-f338c38782ec",
+                            TwoFactorEnabled = false,
+                            UserName = "admin@company.com"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "d4590660-4d0c-48aa-96f8-d7709f8edf35",
+                            DepartmentName = "Muhasebe",
+                            Email = "personel@company.com",
+                            EmailConfirmed = true,
+                            FirstName = "Ali",
+                            Iban = "TR111111111111111111111111",
+                            LastName = "Yılmaz",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "PERSONEL@COMPANY.COM",
+                            NormalizedUserName = "PERSONEL@COMPANY.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFCG/NoK42tn2urNLIazYOuL7gbYvx9vqaD3UMfsozzAMzJg50ivzCj3P9YjA6rCDg==",
+                            PhoneNumberConfirmed = false,
+                            Position = "Personel",
+                            SecurityStamp = "4f10ed65-4861-4523-b6e4-6567dd2059dc",
+                            TwoFactorEnabled = false,
+                            UserName = "personel@company.com"
+                        });
                 });
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Payment", b =>
@@ -269,7 +527,7 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<long?>("CreatedBy")
                         .HasColumnType("bigint");
@@ -280,7 +538,7 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.Property<DateOnly?>("CreatedDateOnly")
                         .HasColumnType("date");
 
-                    b.Property<long>("ExpenseId")
+                    b.Property<long>("ExpenditureId")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsActive")
@@ -292,20 +550,11 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<string>("TargetIban")
                         .IsRequired()
                         .HasMaxLength(26)
                         .HasColumnType("character varying(26)");
 
-                    b.Property<string>("TransactionReference")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<long?>("UpdatedBy")
                         .HasColumnType("bigint");
 
@@ -317,128 +566,125 @@ namespace ExpenseManagementSystem.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExpenseId")
+                    b.HasIndex("ExpenditureId")
                         .IsUnique();
 
                     b.ToTable("Payments", "table");
                 });
 
-            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.User", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<long?>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateOnly?>("CreatedDateOnly")
-                        .HasColumnType("date");
-
-                    b.Property<string>("DepartmentName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("IBAN")
-                        .IsRequired()
-                        .HasMaxLength(26)
-                        .HasColumnType("character varying(26)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
+                    b.Property<string>("ClaimType")
                         .HasColumnType("text");
 
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
 
                     b.Property<long>("RoleId")
                         .HasColumnType("bigint");
-
-                    b.Property<long?>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateOnly?>("UpdatedDateOnly")
-                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", "table");
+                    b.ToTable("AspNetRoleClaims", "table");
                 });
 
-            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.UserRole", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<long>("UserId")
                         .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long?>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateOnly?>("CreatedDateOnly")
-                        .HasColumnType("date");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<long?>("UpdatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateOnly?>("UpdatedDateOnly")
-                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", "table");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", "table");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<long>", b =>
+                {
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RoleId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
                     b.ToTable("UserRoles", "table");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1L,
+                            RoleId = 1L
+                        },
+                        new
+                        {
+                            UserId = 2L,
+                            RoleId = 2L
+                        });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<long>", b =>
+                {
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", "table");
                 });
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Expenditure", b =>
@@ -462,10 +708,16 @@ namespace ExpenseManagementSystem.Persistence.Migrations
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Expense", b =>
                 {
-                    b.HasOne("ExpenseManagementSystem.Domain.Entities.User", "ApprovedBy")
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", "ApprovedBy")
                         .WithMany()
                         .HasForeignKey("ApprovedById")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Category", "Category")
+                        .WithMany("Expenses")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("ExpenseManagementSystem.Domain.Entities.ExpenseStatus", "Status")
                         .WithMany("Expenses")
@@ -473,13 +725,15 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ExpenseManagementSystem.Domain.Entities.User", "User")
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", "User")
                         .WithMany("Expenses")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("ApprovedBy");
+
+                    b.Navigation("Category");
 
                     b.Navigation("Status");
 
@@ -488,37 +742,81 @@ namespace ExpenseManagementSystem.Persistence.Migrations
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Payment", b =>
                 {
-                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Expense", "Expense")
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Expenditure", "Expenditure")
                         .WithOne("Payment")
-                        .HasForeignKey("ExpenseManagementSystem.Domain.Entities.Payment", "ExpenseId")
+                        .HasForeignKey("ExpenseManagementSystem.Domain.Entities.Payment", "ExpenditureId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Expense");
+                    b.Navigation("Expenditure");
                 });
 
-            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.User", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<long>", b =>
                 {
-                    b.HasOne("ExpenseManagementSystem.Domain.Entities.UserRole", "Role")
-                        .WithMany("Users")
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppRole", null)
+                        .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>
+                {
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<long>", b =>
+                {
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<long>", b =>
+                {
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Role");
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<long>", b =>
+                {
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Expenditures");
+
+                    b.Navigation("Expenses");
+                });
+
+            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Expenditure", b =>
+                {
+                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Expense", b =>
                 {
                     b.Navigation("Expenditures");
-
-                    b.Navigation("Payment")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.ExpenseStatus", b =>
@@ -526,14 +824,9 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                     b.Navigation("Expenses");
                 });
 
-            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.User", b =>
+            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", b =>
                 {
                     b.Navigation("Expenses");
-                });
-
-            modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.UserRole", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

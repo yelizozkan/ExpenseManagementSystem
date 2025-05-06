@@ -1,9 +1,4 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ExpenseManagementSystem.Application.Features.Expenses.Commands.UpdateExpense
 {
@@ -11,11 +6,15 @@ namespace ExpenseManagementSystem.Application.Features.Expenses.Commands.UpdateE
     {
         public UpdateExpenseCommandValidator()
         {
-            RuleFor(x => x.Id).GreaterThan(0);
+            RuleFor(x => x.Id)
+                .GreaterThan(0);
 
-            RuleFor(x => x.Model.Description).MaximumLength(500);
+            RuleFor(x => x.Model.CategoryId)
+                .GreaterThan(0);
 
-            RuleFor(x => x.Model.Total).GreaterThan(0);
+            RuleFor(x => x.Model.Description)
+                .MaximumLength(300);
+
         }
     }
 }

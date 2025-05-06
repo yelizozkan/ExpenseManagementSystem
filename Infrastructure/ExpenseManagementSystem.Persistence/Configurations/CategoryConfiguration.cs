@@ -22,6 +22,11 @@ namespace ExpenseManagementSystem.Persistence.Configurations
                 .WithOne(x => x.Category)
                 .HasForeignKey(x => x.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(x => x.Expenses)
+                .WithOne(x => x.Category)
+                .HasForeignKey(x => x.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

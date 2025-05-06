@@ -1,6 +1,5 @@
-﻿using ExpenseManagementSystem.Application.Dtos;
-using ExpenseManagementSystem.Domain.Identity;
-
+﻿using ExpenseManagementSystem.Application.Dtos.Auth;
+using ExpenseManagementSystem.Domain.Entities.Identity;
 
 namespace ExpenseManagementSystem.Application.Abstractions.Token
 {

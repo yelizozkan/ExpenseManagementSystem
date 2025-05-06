@@ -1,6 +1,4 @@
-﻿
-
-namespace ExpenseManagementSystem.Application.Dtos.Expenditure
+﻿namespace ExpenseManagementSystem.Application.Dtos.Expenditure
 {
     public class ExpenditureResponseDto
     {
@@ -13,6 +11,8 @@ namespace ExpenseManagementSystem.Application.Dtos.Expenditure
         public decimal TaxAmount { get; set; }
         public string ReceiptFilePath { get; set; }
         public string ReceiptNumber { get; set; }
+        public long? PaymentId { get; set; }
+        public bool? IsApprovedForPayment { get; set; }
         public bool IsActive { get; set; }
     }
 }

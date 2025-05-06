@@ -15,5 +15,8 @@ namespace ExpenseManagementSystem.Domain.Entities
         public decimal TaxAmount { get; set; }
         public string ReceiptFilePath { get; set; }    
         public string ReceiptNumber { get; set; }
+        public bool? IsApprovedForPayment { get; set; }
+        public long? PaymentId { get; set; }
+        public virtual Payment? Payment { get; set; }
     }
 }

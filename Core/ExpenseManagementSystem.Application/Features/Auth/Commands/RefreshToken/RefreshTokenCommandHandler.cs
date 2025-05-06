@@ -1,10 +1,11 @@
 ﻿using ExpenseManagementSystem.Application.Abstractions.Services;
-using ExpenseManagementSystem.Application.Dtos;
+using ExpenseManagementSystem.Application.Dtos.Auth;
+using ExpenseManagementSystem.Application.Responses;
 using MediatR;
 
 namespace ExpenseManagementSystem.Application.Features.Auth.Commands.RefreshToken
 {
-    public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, TokenDto>
+    public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, ApiResponse<TokenDto>>
     {
         private readonly IAuthService _authService;
 
@@ -13,9 +14,9 @@ namespace ExpenseManagementSystem.Application.Features.Auth.Commands.RefreshToke
             _authService = authService;
         }
 
-        public async Task<TokenDto> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<TokenDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
-            return await _authService.RefreshTokenLoginAsync(request.Model.RefreshToken);
+            return await _authService.RefreshTokenLoginAsync(request.Model);
         }
     }
 }

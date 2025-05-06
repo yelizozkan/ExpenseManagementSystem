@@ -7,7 +7,8 @@ namespace ExpenseManagementSystem.Application.Features.Categories.Commands.Delet
     {
         public DeleteCategoryCommandValidator()
         {
-            RuleFor(x => x.Id).GreaterThan(0).WithMessage("Geçersiz kategori ID.");
+            RuleFor(x => x.Id)
+                .GreaterThan(0);
         }
     }
 }

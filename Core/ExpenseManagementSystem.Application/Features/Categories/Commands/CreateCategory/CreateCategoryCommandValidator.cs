@@ -8,8 +8,11 @@ namespace ExpenseManagementSystem.Application.Features.Categories.Commands.Creat
         public CreateCategoryCommandValidator()
         {
             RuleFor(x => x.Model.Name)
-                .NotEmpty().WithMessage("Kategori adı boş olamaz.")
-                .MaximumLength(100).WithMessage("Kategori adı en fazla 100 karakter olabilir.");
+                .NotEmpty()
+                .MaximumLength(100);
+
+            RuleFor(x => x.Model.Description)
+                .MaximumLength(300);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using ExpenseManagementSystem.Application.Abstractions.Services;
+﻿using ExpenseManagementSystem.Application.Abstractions.Services;
 using ExpenseManagementSystem.Application.Dtos.Expenditure;
 using MediatR;
 
@@ -9,18 +8,15 @@ namespace ExpenseManagementSystem.Application.Features.Expenditures.Commands.Upd
     public class UpdateExpenditureCommandHandler : IRequestHandler<UpdateExpenditureCommand, ExpenditureResponseDto>
     {
         private readonly IExpenditureService _expenditureService;
-        private readonly IMapper _mapper;
 
-        public UpdateExpenditureCommandHandler(IExpenditureService expenditureService, IMapper mapper)
+        public UpdateExpenditureCommandHandler(IExpenditureService expenditureService)
         {
             _expenditureService = expenditureService;
-            _mapper = mapper;
         }
 
         public async Task<ExpenditureResponseDto> Handle(UpdateExpenditureCommand request, CancellationToken cancellationToken)
         {
-            var result = await _expenditureService.UpdateAsync(request.Id, request.Model);
-            return _mapper.Map<ExpenditureResponseDto>(result);
+            return await _expenditureService.UpdateAsync(request.Id, request.Model);
         }
     }
 }

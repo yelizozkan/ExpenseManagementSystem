@@ -6,9 +6,10 @@ namespace ExpenseManagementSystem.Application.Abstractions.Services
 {
     public interface IExpenseService
     {
-        Task<Expense> CreateAsync(ExpenseRequestDto model);
-        Task<Expense> UpdateAsync(long id, ExpenseRequestDto model);
-        Task<bool> DeleteAsync(long id);
-
+        Task<ExpenseResponseDto> CreateAsync(ExpenseRequestDto model);
+        Task<ExpenseResponseDto> UpdateAsync(long id, ExpenseRequestDto model);
+        Task<bool> SoftDeleteAsync(long id);
+        Task<ExpenseResponseDto> ApproveAsync(long expenseId, string? note);
+        Task<ExpenseResponseDto> RejectAsync(long expenseId, string? rejectionNote);
     }
 }

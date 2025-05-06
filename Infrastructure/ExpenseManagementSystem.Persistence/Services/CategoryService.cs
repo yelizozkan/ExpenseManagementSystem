@@ -1,4 +1,5 @@
-﻿using ExpenseManagementSystem.Application.Abstractions.Repository;
+﻿using AutoMapper;
+using ExpenseManagementSystem.Application.Abstractions.Repository;
 using ExpenseManagementSystem.Application.Abstractions.Services;
 using ExpenseManagementSystem.Application.Abstractions.UnitOfWork;
 using ExpenseManagementSystem.Application.Dtos.Category;
@@ -12,48 +13,64 @@ namespace ExpenseManagementSystem.Persistence.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IExpenseRepository _expenseRepository;
         private readonly IExpenditureRepository _expenditureRepository;
+        private readonly IMapper _mapper;
 
-
-        public CategoryService(IUnitOfWork unitOfWork, ICategoryRepository categoryRepository, IExpenditureRepository expenditureRepository)
+        public CategoryService(
+            IUnitOfWork unitOfWork,
+            ICategoryRepository categoryRepository,
+            IExpenseRepository expenseRepository,
+            IExpenditureRepository expenditureRepository,
+            IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _categoryRepository = categoryRepository;
+            _expenseRepository = expenseRepository;
             _expenditureRepository = expenditureRepository;
+            _mapper = mapper;
         }
 
-        public async Task<Category> CreateAsync(CategoryRequestDto category)
+        public async Task<CategoryResponseDto> CreateAsync(CategoryRequestDto category)
         {
-            if(await IsNameTakenAsync(category.Name))
+            if (await IsNameTakenAsync(category.Name))
                 throw new ConflictException("Bu kategori adı zaten kullanılıyor.");
 
-            var categoryObject = new Category
-            {
-                Name = category.Name,
-                Description = category.Description,
-                IsActive = true
-            };
+            var entity = _mapper.Map<Category>(category);
+            entity.IsActive = true;
 
-            await _categoryRepository.AddAsync(categoryObject);
+            await _categoryRepository.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
-            return categoryObject;
+
+            return _mapper.Map<CategoryResponseDto>(entity);
         }
 
 
-        public async Task<bool> IsNameTakenAsync(string name)
+        public async Task<CategoryResponseDto> UpdateAsync(long id, CategoryRequestDto category)
         {
-            return await _categoryRepository.AnyAsync(c => c.Name == name && c.IsActive);
+            var entity = await _categoryRepository.GetByIdAsync(id)
+                ?? throw new NotFoundException("Kategori bulunamadı.");
+
+            entity.Name = category.Name;
+            entity.Description = category.Description;
+
+            _categoryRepository.Update(entity);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<CategoryResponseDto>(entity);
         }
+
 
         public async Task<bool> SoftDeleteAsync(long id)
         {
-            var category = await _categoryRepository.GetByIdAsync(id);
-            if (category == null)
-                throw new KeyNotFoundException("Kategori bulunamadı.");
+            var category = await _categoryRepository.GetByIdAsync(id)
+                ?? throw new NotFoundException("Kategori bulunamadı.");
 
-            var hasActiveExpenditure = await _expenditureRepository.AnyAsync(e => e.CategoryId == id && e.Expense.IsActive);
-            if (hasActiveExpenditure)
-                throw new ConflictException("Bu kategoriye ait aktif harcama bulunduğu için silinemez.");
+            var isUsedInExpenses = await _expenseRepository.AnyAsync(e => e.CategoryId == id && e.IsActive);
+            var isUsedInExpenditures = await _expenditureRepository.AnyAsync(e => e.CategoryId == id && e.IsActive);
+
+            if (isUsedInExpenses || isUsedInExpenditures)
+                throw new ConflictException("Bu kategoriye ait aktif harcama veya harcama kalemi bulunduğu için silinemez.");
 
             category.IsActive = false;
             _categoryRepository.Update(category);
@@ -61,19 +78,9 @@ namespace ExpenseManagementSystem.Persistence.Services
             return true;
         }
 
-        public async Task<Category> UpdateAsync(long id, CategoryRequestDto category)
+        public async Task<bool> IsNameTakenAsync(string name)
         {
-            var categoryObject = await _categoryRepository.GetByIdAsync(id);
-            if (category == null)
-                throw new Exception("Kategori bulunamadı.");
-
-            categoryObject.Name = category.Name;
-            categoryObject.Description = category.Description;
-
-            _categoryRepository.Update(categoryObject);
-            await _unitOfWork.SaveChangesAsync();
-            return categoryObject;
+            return await _categoryRepository.AnyAsync(x => x.Name == name && x.IsActive);
         }
     }
-
 }

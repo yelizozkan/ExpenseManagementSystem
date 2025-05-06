@@ -1,28 +1,25 @@
-﻿
-
-using System.Text.Json;
+﻿using System.Text.Json;
 
 namespace ExpenseManagementSystem.Application.Responses
 {
     public class ApiResponse
     {
-        public override string ToString()
+        public override string ToString() => JsonSerializer.Serialize(this);
+
+        public ApiResponse() { }
+
+        public ApiResponse(string message)
         {
-            return JsonSerializer.Serialize(this);
+            Success = false;
+            Message = message;
         }
 
-        public ApiResponse(string message = null, bool v = false)
+        public ApiResponse(string message, bool success)
         {
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                Success = true;
-            }
-            else
-            {
-                Success = false;
-                Message = message;
-            }
+            Success = success;
+            Message = message;
         }
+
         public bool Success { get; set; }
         public string Message { get; set; }
         public DateTime ServerDate { get; set; } = DateTime.UtcNow;
@@ -54,6 +51,12 @@ namespace ExpenseManagementSystem.Application.Responses
             Success = false;
             Response = default;
             Message = message;
+        }
+        public ApiResponse(string message, bool success)
+        {
+            Success = success;
+            Message = message;
+            Response = default;
         }
     }
 }

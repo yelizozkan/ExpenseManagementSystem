@@ -15,7 +15,7 @@ namespace ExpenseManagementSystem.Application.Features.Expenses.Commands.DeleteE
 
         public async Task<bool> Handle(DeleteExpenseCommand request, CancellationToken cancellationToken)
         {
-            return await _expenseService.DeleteAsync(request.Id);
+            return await _expenseService.SoftDeleteAsync(request.Id);
         }
     }
 }

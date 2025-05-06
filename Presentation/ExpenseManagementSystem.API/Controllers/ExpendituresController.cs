@@ -1,18 +1,21 @@
 ﻿using ExpenseManagementSystem.Application.Dtos.Expenditure;
+using ExpenseManagementSystem.Application.Features.Expenditures.Commands.ApproveExpenditure;
 using ExpenseManagementSystem.Application.Features.Expenditures.Commands.CreateExpenditure;
 using ExpenseManagementSystem.Application.Features.Expenditures.Commands.DeleteExpenditure;
+using ExpenseManagementSystem.Application.Features.Expenditures.Commands.RejectExpenditure;
 using ExpenseManagementSystem.Application.Features.Expenditures.Commands.UpdateExpenditure;
 using ExpenseManagementSystem.Application.Features.Expenditures.Queries.GetAllExpenditures;
 using ExpenseManagementSystem.Application.Features.Expenditures.Queries.GetExpenditureById;
-using ExpenseManagementSystem.Application.Features.Expenditures.Queries.GetExpenditureByParameter;
 using ExpenseManagementSystem.Application.Responses;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpenseManagementSystem.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ExpendituresController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -24,7 +27,7 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpGet("GetAll")]
-        //[Authorize(Roles = "admin,user")]
+        [Authorize(Roles = "Admin,Personnel")]
         public async Task<ApiResponse<List<ExpenditureResponseDto>>> GetAll()
         {
             var query = new GetAllExpendituresQuery();
@@ -34,7 +37,7 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpGet("GetById/{id}")]
-        //[Authorize(Roles = "admin,user")]
+        [Authorize(Roles = "Admin,Personnel")]
         public async Task<ApiResponse<ExpenditureResponseDto>> GetById([FromRoute] long id)
         {
             var query = new GetExpenditureByIdQuery(id);
@@ -43,30 +46,10 @@ namespace ExpenseManagementSystem.API.Controllers
         }
 
 
-        [HttpGet("ByParameters")]
-        ////[Authorize(Roles = "admin,user")]
-        public async Task<ApiResponse<List<ExpenditureResponseDto>>> GetByParameters(
-            [FromQuery] long? expenseId, [FromQuery] long? categoryId, [FromQuery] DateTime? date)
-        {
-           var model = new GetExpenditureByParameterRequestDto
-            {
-                ExpenseId = expenseId,
-                CategoryId = categoryId,
-                Date = date
-            };
-
-            var query = new GetExpenditureByParameterQuery(model);
-            var result = await _mediator.Send(query);
-            return new ApiResponse<List<ExpenditureResponseDto>>(result);
-        }
-
-
         [HttpPost]
-        //[Authorize(Roles = "admin,user")]
-        public async Task<ApiResponse<ExpenditureResponseDto>> Post(
-            [FromForm] ExpenditureRequestDto model)
+        [Authorize(Roles = "Admin,Personnel")]
+        public async Task<ApiResponse<ExpenditureResponseDto>> Post([FromForm] ExpenditureRequestDto model)
         {
-           
             var command = new CreateExpenditureCommand(model);
             var result = await _mediator.Send(command);
             return new ApiResponse<ExpenditureResponseDto>(result);
@@ -74,7 +57,7 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpPut("{id}")]
-        //[Authorize(Roles = "admin,user")]
+        [Authorize(Roles = "Admin,Personnel")]
         public async Task<ApiResponse<ExpenditureResponseDto>> Put([FromRoute] long id, [FromBody] ExpenditureRequestDto model)
         {
             var command = new UpdateExpenditureCommand(id, model);
@@ -84,7 +67,7 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpDelete("{id}")]
-        ////[Authorize(Roles = "admin")]
+        [Authorize(Roles = "Admin,Personnel")]
         public async Task<ApiResponse> Delete([FromRoute] long id)
         {
            var command = new DeleteExpenditureCommand(id);
@@ -93,5 +76,24 @@ namespace ExpenseManagementSystem.API.Controllers
                 ? new ApiResponse("Harcama kaydı silindi", true)
                 : new ApiResponse("Harcama kaydı bulunamadı veya zaten silinmiş", false);
         }
+
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("expenditures/{id}/approve-payment")]
+        public async Task<IActionResult> ApproveExpenditureForPayment(long id)
+        {
+            var result = await _mediator.Send(new ApproveExpenditureCommand(id));
+            return Ok(result);
+        }
+
+
+        [HttpPut("{id}/reject-payment")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RejectExpenditureForPayment(long id)
+        {
+            var result = await _mediator.Send(new RejectExpenditureCommand(id));
+            return Ok(result);
+        }
+
     }
 }

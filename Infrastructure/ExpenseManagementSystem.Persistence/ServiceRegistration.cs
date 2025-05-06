@@ -23,12 +23,30 @@ namespace ExpenseManagementSystem.Persistence
             serviceCollection.AddScoped<IExpenditureService, ExpenditureService>();
             serviceCollection.AddScoped<IExpenditureQueryService, ExpenditureQueryService>();
 
+
             serviceCollection.AddScoped<IExpenseService, ExpenseService>();
+            serviceCollection.AddScoped<IExpenseQueryService, ExpenseQueryService>();
+
             serviceCollection.AddScoped<IExpenseRepository, ExpenseRepository>();
+            
 
             serviceCollection.AddScoped<IExpenseStatusRepository, ExpenseStatusRepository>();
+            serviceCollection.AddScoped<IExpenseStatusService, ExpenseStatusService>();
+            serviceCollection.AddScoped<IExpenseStatusQueryService, ExpenseStatusQueryService>();
 
             serviceCollection.AddScoped<IAuthService, AuthService>();
+
+            serviceCollection.AddScoped<IPaymentRepository, PaymentRepository>();
+            serviceCollection.AddScoped<IPaymentService, PaymentService>();
+            serviceCollection.AddScoped<IPaymentQueryService, PaymentQueryService>();
+
+            serviceCollection.AddScoped<IUserRepository, UserRepository>();
+            serviceCollection.AddScoped<IUserService, UserService>();
+
+            serviceCollection.AddScoped<IUserRoleService, UserRoleService>();
+            serviceCollection.AddScoped<IReportService, ReportService>();
+
+
 
             serviceCollection.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 

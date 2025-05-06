@@ -16,11 +16,7 @@ namespace ExpenseManagementSystem.Application.Features.Categories.Queries.GetCat
 
         public async Task<CategoryResponseDto> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
         {
-            var result = await _categoryQueryService.GetByIdAsync(request.Id);
-            if (result == null)
-                throw new Exception("Kategori bulunamadı.");
-
-            return result;
+            return await _categoryQueryService.GetByIdAsync(request.Id);
         }
     }
 }

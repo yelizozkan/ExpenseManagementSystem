@@ -1,11 +1,6 @@
 ﻿using ExpenseManagementSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ExpenseManagementSystem.Persistence.Configurations
 {
@@ -26,6 +21,14 @@ namespace ExpenseManagementSystem.Persistence.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
+            builder.Property(x => x.Amount)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
+
+            builder.Property(x => x.TaxAmount)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
+
             builder.HasOne(x => x.Expense)
                 .WithMany(x => x.Expenditures)
                 .HasForeignKey(x => x.ExpenseId)
@@ -35,6 +38,11 @@ namespace ExpenseManagementSystem.Persistence.Configurations
                 .WithMany(x => x.Expenditures)
                 .HasForeignKey(x => x.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(x => x.Payment)
+                .WithOne(x => x.Expenditure)
+                .HasForeignKey<Expenditure>(x => x.PaymentId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

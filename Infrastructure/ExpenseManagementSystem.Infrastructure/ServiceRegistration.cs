@@ -2,7 +2,6 @@
 using ExpenseManagementSystem.Infrastructure.Services.Token;
 using Microsoft.Extensions.DependencyInjection;
 
-
 namespace ExpenseManagementSystem.Infrastructure
 {
     public static class ServiceRegistration

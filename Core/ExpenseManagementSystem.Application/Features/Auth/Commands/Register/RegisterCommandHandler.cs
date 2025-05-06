@@ -1,11 +1,12 @@
 ﻿using ExpenseManagementSystem.Application.Abstractions.Services;
-using ExpenseManagementSystem.Application.Dtos;
+using ExpenseManagementSystem.Application.Dtos.Auth;
+using ExpenseManagementSystem.Application.Responses;
 using MediatR;
 
 
 namespace ExpenseManagementSystem.Application.Features.Auth.Commands.Register
 {
-    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, TokenDto>
+    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiResponse<TokenDto>>
     {
         private readonly IAuthService _authService;
 
@@ -14,7 +15,7 @@ namespace ExpenseManagementSystem.Application.Features.Auth.Commands.Register
             _authService = authService;
         }
 
-        public async Task<TokenDto> Handle(RegisterCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<TokenDto>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
             return await _authService.RegisterAsync(request.Model);
         }

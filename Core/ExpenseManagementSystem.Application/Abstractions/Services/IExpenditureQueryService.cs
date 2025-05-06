@@ -7,6 +7,5 @@ namespace ExpenseManagementSystem.Application.Abstractions.Services
     {
         Task<List<ExpenditureResponseDto>> GetAllAsync();
         Task<ExpenditureResponseDto?> GetByIdAsync(long id);
-        Task<List<ExpenditureResponseDto>> GetByParameterAsync(long? expenseId, long? categoryId, DateTime? date);
     }
 }

@@ -7,9 +7,10 @@ namespace ExpenseManagementSystem.Application.Features.Expenses.Commands.CreateE
     {
         public CreateExpenseCommandValidator()
         {
-            RuleFor(x => x.Model.Description).MaximumLength(500);
+            RuleFor(x => x.Model.Description).MaximumLength(300);
 
-            RuleFor(x => x.Model.Total).GreaterThan(0);
+            RuleFor(x => x.Model.CategoryId).GreaterThan(0);
+
         }
     }
 }

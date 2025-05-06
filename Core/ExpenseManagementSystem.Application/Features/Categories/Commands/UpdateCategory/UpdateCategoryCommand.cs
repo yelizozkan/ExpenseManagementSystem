@@ -6,7 +6,7 @@ namespace ExpenseManagementSystem.Application.Features.Categories.Commands.Updat
 {
     public class UpdateCategoryCommand : IRequest<CategoryResponseDto>
     {
-        public long Id { get; set; } // silincek
+        public long Id { get; set; } 
         public CategoryRequestDto Model { get; set; }
 
         public UpdateCategoryCommand(long id, CategoryRequestDto model)
