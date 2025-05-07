@@ -5,7 +5,6 @@ using ExpenseManagementSystem.Application.Abstractions.UnitOfWork;
 using ExpenseManagementSystem.Application.Dtos.Expenditure;
 using ExpenseManagementSystem.Application.Exceptions;
 using ExpenseManagementSystem.Application.Helpers;
-using ExpenseManagementSystem.Application.Responses;
 using ExpenseManagementSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,18 +16,24 @@ namespace ExpenseManagementSystem.Persistence.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IExpenditureRepository _expenditureRepository;
         private readonly IExpenseRepository _expenseRepository;
+        private readonly IExpenseStatusRepository _expenseStatusRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IUserAccessor _userAccessor;
         private readonly IMapper _mapper;
 
         public ExpenditureService(IUnitOfWork unitOfWork, IExpenditureRepository expenditureRepository,
-            IMapper mapper, IExpenseRepository expenseRepository, ICategoryRepository categoryRepository)
+            IMapper mapper, IExpenseRepository expenseRepository, ICategoryRepository categoryRepository, IExpenseStatusRepository expenseStatusRepository,
+            IUserAccessor userAccessor)
         {
             _unitOfWork = unitOfWork;
             _expenditureRepository = expenditureRepository;
             _mapper = mapper;
+            _userAccessor = userAccessor;
             _expenseRepository = expenseRepository;
             _categoryRepository = categoryRepository;
+            _expenseStatusRepository = expenseStatusRepository;
         }
+
 
         public async Task<ExpenditureResponseDto> CreateAsync(ExpenditureRequestDto model)
         {
@@ -37,6 +42,13 @@ namespace ExpenseManagementSystem.Persistence.Services
             var expenditure = _mapper.Map<Expenditure>(model);
             expenditure.ReceiptFilePath = await FileHelper.SaveFileAsync(model.ReceiptFile);
             expenditure.IsActive = true;
+
+            var pendingStatusId = await _expenseStatusRepository.GetStatusIdByNameAsync("Pending");
+
+            if (pendingStatusId == 0)
+                throw new NotFoundException("Pending durumu bulunamadı.");
+
+            expenditure.StatusId = pendingStatusId;
 
             await _expenditureRepository.AddAsync(expenditure);
             await UpdateExpenseTotalAsync(expenditure.ExpenseId);
@@ -53,9 +65,20 @@ namespace ExpenseManagementSystem.Persistence.Services
 
             await ValidateBeforeUpdate(id, model);
 
-            _mapper.Map(model, expenditure);
+            if (model.ReceiptFile != null)
+            {
+                expenditure.ReceiptFilePath = await FileHelper.SaveFileAsync(model.ReceiptFile);
+            }
+
+            expenditure.Description = model.Description;
+            expenditure.Date = model.Date;
+            expenditure.CategoryId = model.CategoryId;
+            expenditure.Amount = model.Amount;
+            expenditure.TaxAmount = model.TaxAmount;
+            expenditure.ReceiptNumber = model.ReceiptNumber;
 
             _expenditureRepository.Update(expenditure);
+
             await UpdateExpenseTotalAsync(model.ExpenseId);
             await _unitOfWork.SaveChangesAsync();
             
@@ -82,36 +105,82 @@ namespace ExpenseManagementSystem.Persistence.Services
         }
 
 
-        public async Task<ApiResponse> ApproveForPaymentAsync(long id)
+        public async Task<ExpenditureResponseDto> ApproveExpenditureAsync(long id, string? note)
         {
             var expenditure = await _expenditureRepository.GetByIdAsync(id)
-        ?? throw new NotFoundException("Harcama kalemi bulunamadı.");
+                ?? throw new NotFoundException("Harcama kaydı bulunamadı.");
 
-            if (expenditure.IsApprovedForPayment == true)
-                throw new ConflictException("Bu kalem zaten ödeme için onaylanmış.");
+            if (!expenditure.IsActive)
+                throw new ConflictException("Pasif harcama onaylanamaz.");
 
-            expenditure.IsApprovedForPayment = true;
+            var approvedStatusId = await _expenseStatusRepository.GetStatusIdByNameAsync("Approved");
+            if (approvedStatusId == null)
+                throw new NotFoundException("Approved durumu bulunamadı.");
+
+            expenditure.StatusId = approvedStatusId;
+            expenditure.ApprovalNote = note;
+            expenditure.ApprovalDate = DateTime.UtcNow;
+            expenditure.ApprovedById = _userAccessor.GetUserId();
+           
 
             _expenditureRepository.Update(expenditure);
+
+            await UpdateExpenseStatusAsync(expenditure.ExpenseId);
+
             await _unitOfWork.SaveChangesAsync();
 
-            return new ApiResponse("Ödeme için onaylandı", true);
+            return _mapper.Map<ExpenditureResponseDto>(expenditure);
         }
 
-        public async Task<ApiResponse> RejectForPaymentAsync(long id)
+
+        public async Task<ExpenditureResponseDto> RejectExpenditureAsync(long id, string? note)
         {
             var expenditure = await _expenditureRepository.GetByIdAsync(id)
-                ?? throw new NotFoundException("Harcama kalemi bulunamadı.");
+                ?? throw new NotFoundException("Harcama kaydı bulunamadı.");
 
-            if (expenditure.IsApprovedForPayment == false)
-                throw new ConflictException("Bu kalem zaten ödeme için reddedilmiş.");
+            if (!expenditure.IsActive)
+                throw new ConflictException("Pasif harcama reddedilemez.");
 
-            expenditure.IsApprovedForPayment = false;
+            var rejectedStatusId = await _expenseStatusRepository.GetStatusIdByNameAsync("Rejected");
+
+            if (rejectedStatusId == 0)
+                throw new NotFoundException("Rejected durumu bulunamadı.");
+
+            expenditure.StatusId = rejectedStatusId;
+            expenditure.ApprovalNote = note;
+            expenditure.ApprovalDate = DateTime.UtcNow;
+            expenditure.ApprovedById = _userAccessor.GetUserId();
 
             _expenditureRepository.Update(expenditure);
+
+            await UpdateExpenseStatusAsync(expenditure.ExpenseId);
             await _unitOfWork.SaveChangesAsync();
 
-            return new ApiResponse("Ödeme için reddedildi.", true);
+            return _mapper.Map<ExpenditureResponseDto>(expenditure);
+        }
+
+
+        private async Task UpdateExpenseStatusAsync(long expenseId)
+        {
+            var expense = await _expenseRepository
+                .GetByIdWithIncludesAsync(expenseId, include =>
+                 include.Include(e => e.Expenditures)
+                .ThenInclude(e => e.Status));
+
+            if (expense == null)
+                throw new NotFoundException("Expense bulunamadı.");
+
+            var expenditures = expense.Expenditures.Where(e => e.IsActive).ToList();
+
+            bool allApproved = expenditures.All(e => e.Status != null && e.Status.Name == "Approved");
+            bool allRejected = expenditures.All(e => e.Status != null && e.Status.Name == "Rejected");
+
+            var status = await _expenseStatusRepository.GetStatusIdByNameAsync(
+                allApproved ? "Approved" :
+                allRejected ? "Rejected" : "Pending");
+
+            expense.StatusId = status;
+            _expenseRepository.Update(expense);
         }
 
 

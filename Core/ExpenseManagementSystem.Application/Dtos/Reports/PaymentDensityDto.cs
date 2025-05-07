@@ -2,7 +2,7 @@
 {
     public class PaymentDensityDto
     {
-        public DateTime Date { get; set; }
+        public DateTime GroupedDate { get; set; }
         public decimal TotalAmount { get; set; }
         public int PaymentCount { get; set; }
         public string EmployeeName { get; set; }

@@ -48,10 +48,9 @@ namespace ExpenseManagementSystem.Persistence.Repositories
             return query.Where(predicate);
         }
 
-        public async Task<bool> AddAsync(TEntity entity)
+        public async Task AddAsync(TEntity entity)
         {
-            EntityEntry<TEntity> entityEntry = await Table.AddAsync(entity);
-            return entityEntry.State == EntityState.Added;
+            await Table.AddAsync(entity);
         }
 
         public async Task AddRangeAsync(IEnumerable<TEntity> entities)

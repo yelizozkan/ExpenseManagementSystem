@@ -5,7 +5,7 @@ namespace ExpenseManagementSystem.Application.Abstractions.Repository
 {
     public interface IExpenseStatusRepository : IRepository<ExpenseStatus>
     {
-        Task<ExpenseStatus> GetByNameAsync(string name);
+        Task<long> GetStatusIdByNameAsync(string name);
     }
 
 }

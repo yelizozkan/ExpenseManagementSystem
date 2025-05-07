@@ -43,24 +43,23 @@ namespace ExpenseManagementSystem.Persistence.Services
             var userId = _userAccessor.GetUserId();
 
             await EnsureValidCategory(model.CategoryId);
-            var status = await GetStatusIdAsync("Pending");
+
+            var pendingStatusId = await GetStatusIdAsync("Pending");
 
             var expense = _mapper.Map<Expense>(model);
 
             expense.UserId = userId;
             expense.SubmissionDate = DateTime.UtcNow;
-            expense.StatusId = status;
+            expense.StatusId = pendingStatusId;
             expense.Total = 0;
 
             await _expenseRepository.AddAsync(expense);
             await _unitOfWork.SaveChangesAsync();
 
-            var createdExpense = await _expenseRepository
-                .Table
-                .Include(e => e.User)
-                .Include(e => e.Status) 
-                .Include(e => e.Expenditures) 
-                .FirstOrDefaultAsync(e => e.Id == expense.Id);
+            var createdExpense = await _expenseRepository.GetByIdWithIncludesAsync(expense.Id,
+                q => q.Include(e => e.User)
+                .Include(e => e.Status)
+                .Include(e => e.Expenditures));
 
             return _mapper.Map<ExpenseResponseDto>(createdExpense);
         }
@@ -77,14 +76,20 @@ namespace ExpenseManagementSystem.Persistence.Services
             if (expense.UserId != userId)
                 throw new UnauthorizedAccessException("Yalnızca kendi masraflarınızı güncelleyebilirsiniz.");
 
-            _mapper.Map(model, expense);
+            expense.Description = model.Description;
+            expense.CategoryId = model.CategoryId;
 
             expense.Total = await CalculateTotalAsync(id);
 
             _expenseRepository.Update(expense);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<ExpenseResponseDto>(expense); 
+            var updatedExpense = await _expenseRepository.GetByIdWithIncludesAsync(expense.Id,
+                    q => q.Include(e => e.User)
+                    .Include(e => e.Status)
+                    .Include(e => e.Expenditures));
+
+            return _mapper.Map<ExpenseResponseDto>(updatedExpense);
         }
 
 
@@ -98,53 +103,23 @@ namespace ExpenseManagementSystem.Persistence.Services
             if (expense.UserId != userId)
                 throw new UnauthorizedAccessException("Yalnızca kendi masraflarınızı silebilirsiniz.");
 
+            var expenditures = await _expenditureRepository
+                .Where(x => x.ExpenseId == expense.Id && x.IsActive)
+                .ToListAsync();
+
+            foreach (var item in expenditures)
+            {
+                item.IsActive = false;
+                _expenditureRepository.Update(item);
+            }
+
+
             expense.IsActive = false;
             _expenseRepository.Update(expense);
             await _unitOfWork.SaveChangesAsync();
 
             return true;
         }
-
-        public async Task<ExpenseResponseDto> ApproveAsync(long expenseId, string? note)
-        {
-            var expense = await _expenseRepository.GetByIdAsync(expenseId)
-                ?? throw new NotFoundException("Onaylanacak masraf bulunamadı.");
-
-            var approvedStatus = await GetStatusIdAsync("Approved");
-
-            if (expense.StatusId == approvedStatus)
-                throw new ConflictException("Masraf zaten onaylanmış.");
-
-            expense.StatusId = approvedStatus;
-            expense.ApprovalDate = DateTime.UtcNow;
-            expense.ApprovalNote = note;
-            expense.ApprovedById = _userAccessor.GetUserId();
-
-            _expenseRepository.Update(expense);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<ExpenseResponseDto>(expense);
-        }
-
-        public async Task<ExpenseResponseDto> RejectAsync(long expenseId, string? rejectionNote)
-        {
-            var expense = await _expenseRepository.GetByIdAsync(expenseId)
-                ?? throw new NotFoundException("Expense bulunamadı");
-
-            var rejectedStatus = await _expenseStatusRepository.GetByNameAsync("Rejected")
-                ?? throw new NotFoundException("Rejected durumu sistemde tanımlı değil");
-
-            expense.StatusId = rejectedStatus.Id;
-            expense.ApprovalNote = rejectionNote;
-            expense.ApprovalDate = DateTime.UtcNow;
-            expense.ApprovedById = _userAccessor.GetUserId();
-
-            _expenseRepository.Update(expense);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<ExpenseResponseDto>(expense);
-        }
-
 
         private async Task EnsureValidCategory(long categoryId)
         {
@@ -155,8 +130,12 @@ namespace ExpenseManagementSystem.Persistence.Services
 
         private async Task<long> GetStatusIdAsync(string statusName)
         {
-            var status = await _expenseStatusRepository.GetByNameAsync(statusName);
-            return status?.Id ?? throw new NotFoundException($"'{statusName}' durumu bulunamadı.");
+            var statusId = await _expenseStatusRepository.GetStatusIdByNameAsync(statusName);
+
+            if (statusId == 0)
+                throw new NotFoundException($"'{statusName}' durumu bulunamadı.");
+
+            return statusId;
         }
 
         private async Task<decimal> CalculateTotalAsync(long expenseId)

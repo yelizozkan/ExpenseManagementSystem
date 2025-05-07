@@ -4,6 +4,7 @@ using ExpenseManagementSystem.Application.Abstractions.Services;
 using ExpenseManagementSystem.Application.Abstractions.UnitOfWork;
 using ExpenseManagementSystem.Application.Dtos.Payment;
 using ExpenseManagementSystem.Application.Exceptions;
+using ExpenseManagementSystem.Application.Responses;
 using ExpenseManagementSystem.Domain.Entities;
 
 namespace ExpenseManagementSystem.Persistence.Services
@@ -87,7 +88,7 @@ namespace ExpenseManagementSystem.Persistence.Services
         }
 
 
-        public async Task<bool> DeleteAsync(long id)
+        public async Task<ApiResponse<string>> DeleteAsync(long id)
         {
             var payment = await _paymentRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException("Silinecek ödeme bulunamadı.");
@@ -96,7 +97,8 @@ namespace ExpenseManagementSystem.Persistence.Services
             _paymentRepository.Update(payment);
 
             await _unitOfWork.SaveChangesAsync();
-            return true;
+
+            return new ApiResponse<string>("Ödemeniz başarıyla silinmiştir.", true);
         }
 
 
@@ -105,11 +107,8 @@ namespace ExpenseManagementSystem.Persistence.Services
             if (expenditure.Payment != null)
                 throw new ConflictException("Bu harcama için zaten ödeme yapılmış.");
 
-            if (expenditure.Expense.Status?.Name != "Approved")
+            if (expenditure.StatusId != 2)  
                 throw new BusinessException("Harcama henüz onaylanmadığı için ödeme yapılamaz.");
-
-            if (expenditure.IsApprovedForPayment != true)
-                throw new BusinessException("Bu harcama kalemi için ödeme onayı verilmemiştir.");
 
             if (string.IsNullOrWhiteSpace(expenditure.Expense.User?.Iban))
                 throw new BusinessException("Kullanıcının IBAN bilgisi eksik. Ödeme yapılamaz.");

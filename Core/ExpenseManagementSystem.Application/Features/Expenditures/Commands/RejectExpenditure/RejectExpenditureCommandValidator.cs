@@ -8,6 +8,9 @@ namespace ExpenseManagementSystem.Application.Features.Expenditures.Commands.Rej
         public RejectExpenditureCommandValidator()
         {
             RuleFor(x => x.Id).GreaterThan(0);
+
+            RuleFor(x => x.ApprovalNote).MaximumLength(300);
+          
         }
     }
 }

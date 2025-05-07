@@ -19,20 +19,26 @@ namespace ExpenseManagementSystem.Application.Mapper
 
             CreateMap<Category, CategoryResponseDto>();
 
-
             CreateMap<ExpenditureRequestDto, Expenditure>()
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))         
-                .ForMember(dest => dest.PaymentId, opt => opt.Ignore())          
-                .ForMember(dest => dest.Payment, opt => opt.Ignore());
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.ReceiptFilePath, opt => opt.Ignore())  
+                .ForMember(dest => dest.PaymentId, opt => opt.Ignore())
+                .ForMember(dest => dest.Payment, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovalDate, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovalNote, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedById, opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovedBy, opt => opt.Ignore());
 
-            CreateMap<Expenditure, ExpenditureResponseDto>();
-                
+            CreateMap<Expenditure, ExpenditureResponseDto>()
+                .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.Status.Name))
+                .ForMember(dest => dest.ApprovedByName, opt => opt.MapFrom(src => src.ApprovedBy != null
+                                                                     ? src.ApprovedBy.FirstName + " " + src.ApprovedBy.LastName
+                                                                     : null));
 
             CreateMap<ExpenseRequestDto, Expense>()
                 .ForMember(dest => dest.SubmissionDate, opt => opt.Ignore())
                 .ForMember(dest => dest.StatusId, opt => opt.Ignore())
                 .ForMember(dest => dest.UserId, opt => opt.Ignore());
-
 
             CreateMap<Expense, ExpenseResponseDto>()
                 .ForMember(dest => dest.Total, opt => opt.MapFrom(src => src.Expenditures.Sum(e => e.Amount)))
@@ -41,18 +47,14 @@ namespace ExpenseManagementSystem.Application.Mapper
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
                 .ForMember(dest => dest.Expenditures, opt => opt.MapFrom(src => src.Expenditures));
 
-
-
             CreateMap<ExpenseStatusRequestDto, ExpenseStatus>()
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true)); 
 
             CreateMap<ExpenseStatus, ExpenseStatusResponseDto>();
 
-
             CreateMap<PaymentRequestDto, Payment>();
 
             CreateMap<Payment, PaymentResponseDto>();
-
 
             CreateMap<UserProfileRequestDto, AppUser>()
                 .ForMember(dest => dest.Iban, opt => opt.MapFrom(src => src.Iban))
@@ -60,10 +62,10 @@ namespace ExpenseManagementSystem.Application.Mapper
                 .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position))
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
-
             CreateMap<AppUser, UserProfileResponseDto>()
                 .ForMember(dest => dest.FullName,
                 opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"));
+
 
 
         }

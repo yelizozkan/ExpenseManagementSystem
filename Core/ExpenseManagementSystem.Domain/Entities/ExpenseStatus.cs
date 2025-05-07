@@ -8,5 +8,6 @@ namespace ExpenseManagementSystem.Domain.Entities
         public string Name { get; set; }
         public string? Description { get; set; }
         public virtual ICollection<Expense> Expenses { get; set; }
+        public virtual ICollection<Expenditure> Expenditures { get; set; }
     }
 }

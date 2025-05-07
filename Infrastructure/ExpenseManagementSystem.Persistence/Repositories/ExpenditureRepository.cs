@@ -13,14 +13,15 @@ namespace ExpenseManagementSystem.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<Expenditure?> GetByIdWithExpenseAndUserAsync(long id)
+        public async Task<Expenditure> GetByIdWithExpenseAndUserAsync(long id)
         {
-            return await Table
-              .Include(e => e.Expense)
-              .ThenInclude(exp => exp.Status)
-              .Include(e => e.Expense)
-              .ThenInclude(exp => exp.User)
-              .FirstOrDefaultAsync(e => e.Id == id && e.IsActive);
+            return await _context.Expenditures
+               .Include(e => e.Status) 
+               .Include(e => e.Expense)
+               .ThenInclude(e => e.Status)
+               .Include(e => e.Expense)
+               .ThenInclude(e => e.User)
+               .FirstOrDefaultAsync(e => e.Id == id);
         }
 
     }

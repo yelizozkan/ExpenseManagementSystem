@@ -5,6 +5,6 @@ namespace ExpenseManagementSystem.Application.Abstractions.Repository
 {
     public interface IExpenditureRepository : IRepository<Expenditure>
     {
-        Task<Expenditure?> GetByIdWithExpenseAndUserAsync(long id);
+        Task<Expenditure> GetByIdWithExpenseAndUserAsync(long id);
     }
 }

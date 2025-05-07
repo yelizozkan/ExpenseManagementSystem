@@ -24,7 +24,7 @@ namespace ExpenseManagementSystem.API.Controllers
         }
 
 
-        /// <param name="type">daily | weekly | monthly</param>
+
         [HttpGet("payment-density")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetPaymentDensity([FromQuery] string type = "daily")
@@ -34,7 +34,7 @@ namespace ExpenseManagementSystem.API.Controllers
         }
 
 
-        /// <param name="type">daily | weekly | monthly</param>
+
         [HttpGet("user-expenditure-density")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserExpenditureDensity([FromQuery] string type = "daily")
@@ -43,6 +43,15 @@ namespace ExpenseManagementSystem.API.Controllers
             return Ok(result);
         }
 
+
+
+        [HttpGet("approval-summary")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetApprovalSummary([FromQuery] string type = "daily")
+        {
+            var result = await _reportService.GetApprovalSummaryAsync(type);
+            return Ok(result);
+        }
 
     }
 

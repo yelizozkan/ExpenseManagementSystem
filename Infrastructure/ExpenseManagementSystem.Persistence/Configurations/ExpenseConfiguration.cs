@@ -14,9 +14,6 @@ namespace ExpenseManagementSystem.Persistence.Configurations
             builder.Property(x => x.Description)
                    .HasMaxLength(300);
 
-            builder.Property(x => x.ApprovalNote)
-                   .HasMaxLength(300);
-
             builder.Property(x => x.Total)
                    .IsRequired()
                    .HasColumnType("decimal(18,2)");
@@ -27,11 +24,6 @@ namespace ExpenseManagementSystem.Persistence.Configurations
             builder.HasOne(x => x.User)
                    .WithMany(u => u.Expenses)
                    .HasForeignKey(x => x.UserId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(x => x.ApprovedBy)
-                   .WithMany()
-                   .HasForeignKey(x => x.ApprovedById)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(x => x.Status)

@@ -1,5 +1,4 @@
 ﻿using ExpenseManagementSystem.Application.Dtos.Expenditure;
-using ExpenseManagementSystem.Application.Responses;
 
 
 namespace ExpenseManagementSystem.Application.Abstractions.Services
@@ -9,8 +8,8 @@ namespace ExpenseManagementSystem.Application.Abstractions.Services
         Task<ExpenditureResponseDto> CreateAsync(ExpenditureRequestDto model);
         Task<ExpenditureResponseDto> UpdateAsync(long id, ExpenditureRequestDto model);
         Task<bool> SoftDeleteAsync(long id);
-        Task<ApiResponse> ApproveForPaymentAsync(long id);
-        Task<ApiResponse> RejectForPaymentAsync(long id);
+        Task<ExpenditureResponseDto> ApproveExpenditureAsync(long id, string? note);
+        Task<ExpenditureResponseDto> RejectExpenditureAsync(long id, string? note);
 
     }
 }

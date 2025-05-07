@@ -18,7 +18,7 @@ namespace ExpenseManagementSystem.Application.Abstractions.Repository
 
         IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> predicate, bool tracking = true);
 
-        Task<bool> AddAsync(TEntity entity);
+        Task AddAsync(TEntity entity);
 
         Task AddRangeAsync(IEnumerable<TEntity> entities);
 

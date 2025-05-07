@@ -1,10 +1,10 @@
 ﻿using ExpenseManagementSystem.Application.Abstractions.Services;
-using ExpenseManagementSystem.Application.Responses;
+using ExpenseManagementSystem.Application.Dtos.Expenditure;
 using MediatR;
 
 namespace ExpenseManagementSystem.Application.Features.Expenditures.Commands.RejectExpenditure
 {
-    public class RejectExpenditureCommandHandler : IRequestHandler<RejectExpenditureCommand, ApiResponse>
+    public class RejectExpenditureCommandHandler : IRequestHandler<RejectExpenditureCommand, ExpenditureResponseDto>
     {
         private readonly IExpenditureService _expenditureService;
 
@@ -13,9 +13,9 @@ namespace ExpenseManagementSystem.Application.Features.Expenditures.Commands.Rej
             _expenditureService = expenditureService;
         }
 
-        public async Task<ApiResponse> Handle(RejectExpenditureCommand request, CancellationToken cancellationToken)
+        public async Task<ExpenditureResponseDto> Handle(RejectExpenditureCommand request, CancellationToken cancellationToken)
         {
-            return await _expenditureService.RejectForPaymentAsync(request.Id);
+            return await _expenditureService.RejectExpenditureAsync(request.Id, request.ApprovalNote);
         }
     }
 }

@@ -1,9 +1,10 @@
 ﻿using ExpenseManagementSystem.Application.Abstractions.Services;
+using ExpenseManagementSystem.Application.Responses;
 using MediatR;
 
 namespace ExpenseManagementSystem.Application.Features.Payments.Commands.DeletePayment
 {
-    public class DeletePaymentCommandHandler : IRequestHandler<DeletePaymentCommand, bool>
+    public class DeletePaymentCommandHandler : IRequestHandler<DeletePaymentCommand, ApiResponse<string>>
     {
         private readonly IPaymentService _paymentService;
 
@@ -12,7 +13,7 @@ namespace ExpenseManagementSystem.Application.Features.Payments.Commands.DeleteP
             _paymentService = paymentService;
         }
 
-        public async Task<bool> Handle(DeletePaymentCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<string>> Handle(DeletePaymentCommand request, CancellationToken cancellationToken)
         {
             return await _paymentService.DeleteAsync(request.Id);
         }

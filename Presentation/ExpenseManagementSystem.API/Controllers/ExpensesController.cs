@@ -1,8 +1,6 @@
 ﻿using ExpenseManagementSystem.Application.Dtos.Expense;
-using ExpenseManagementSystem.Application.Features.Expenses.Commands.ApproveExpense;
 using ExpenseManagementSystem.Application.Features.Expenses.Commands.CreateExpense;
 using ExpenseManagementSystem.Application.Features.Expenses.Commands.DeleteExpense;
-using ExpenseManagementSystem.Application.Features.Expenses.Commands.RejectExpense;
 using ExpenseManagementSystem.Application.Features.Expenses.Commands.UpdateExpense;
 using ExpenseManagementSystem.Application.Features.Expenses.Queries.GetAllExpenses;
 using ExpenseManagementSystem.Application.Features.Expenses.Queries.GetExpenseById;
@@ -27,7 +25,6 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpGet("GetAll")]
-        [Authorize(Roles = "Admin,Personnel")]
         public async Task<IActionResult> GetAll()
         {
             var result = await _mediator.Send(new GetAllExpensesQuery());
@@ -36,7 +33,6 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Personnel")]
         public async Task<IActionResult> GetById(long id)
         {
             var result = await _mediator.Send(new GetExpenseByIdQuery(id));
@@ -48,7 +44,6 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Personnel")]
         public async Task<IActionResult> Create([FromBody] ExpenseRequestDto model)
         {
             var command = new CreateExpenseCommand(model);
@@ -58,7 +53,6 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Personnel")]
         public async Task<IActionResult> Update(long id, [FromBody] ExpenseRequestDto model)
         {
             var command = new UpdateExpenseCommand(id, model);
@@ -68,7 +62,6 @@ namespace ExpenseManagementSystem.API.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,Personnel")]
         public async Task<IActionResult> Delete(long id)
         {
             var result = await _mediator.Send(new DeleteExpenseCommand(id));
@@ -76,31 +69,6 @@ namespace ExpenseManagementSystem.API.Controllers
                 ? Ok(new ApiResponse<string>("Masraf başarıyla silindi.", true))
                 : NotFound(new ApiResponse<string>("Silinecek masraf bulunamadı.", false));
 
-        }
-
-
-
-        [HttpPost("{id}/approve")]
-        [Authorize(Roles = "Admin")] 
-        public async Task<IActionResult> Approve(long id, [FromBody] string? note)
-        {
-            var command = new ApproveExpenseCommand
-            {
-                ExpenseId = id,
-                Note = note
-            };
-
-            var result = await _mediator.Send(command);
-            return Ok(new ApiResponse<ExpenseResponseDto>(result));
-        }
-
-
-        [HttpPost("reject/{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Reject(long id, [FromBody] string? note)
-        {
-            var result = await _mediator.Send(new RejectExpenseCommand(id, note));
-            return Ok(result);
         }
 
     }

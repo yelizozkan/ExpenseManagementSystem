@@ -1,4 +1,5 @@
 ﻿using ExpenseManagementSystem.Domain.Entities.Common;
+using ExpenseManagementSystem.Domain.Entities.Identity;
 
 
 namespace ExpenseManagementSystem.Domain.Entities
@@ -15,7 +16,12 @@ namespace ExpenseManagementSystem.Domain.Entities
         public decimal TaxAmount { get; set; }
         public string ReceiptFilePath { get; set; }    
         public string ReceiptNumber { get; set; }
-        public bool? IsApprovedForPayment { get; set; }
+        public DateTime? ApprovalDate { get; set; }
+        public long? ApprovedById { get; set; }
+        public virtual AppUser ApprovedBy { get; set; }
+        public string? ApprovalNote { get; set; }
+        public long StatusId { get; set; }
+        public virtual ExpenseStatus Status { get; set; }
         public long? PaymentId { get; set; }
         public virtual Payment? Payment { get; set; }
     }

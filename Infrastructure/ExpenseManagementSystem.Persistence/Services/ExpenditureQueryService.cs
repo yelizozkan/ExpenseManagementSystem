@@ -26,23 +26,34 @@ namespace ExpenseManagementSystem.Persistence.Services
             var role = _userAccessor.GetUserRole();
             var userId = _userAccessor.GetUserId();
 
-            var query = _expenditureRepository.Where(x => x.IsActive, tracking: false);
+            var query = _expenditureRepository
+                .Where(x => x.IsActive); 
 
             if (role == "Personnel")
             {
                 query = query.Where(x => x.Expense.UserId == userId);
             }
 
-            var expenditures = await query.ToListAsync();
+            var expenditures = await query
+                .Include(x => x.Status)
+                .Include(x => x.ApprovedBy)
+                .AsNoTracking() 
+                .ToListAsync();
+
             return _mapper.Map<List<ExpenditureResponseDto>>(expenditures);
         }
 
         public async Task<ExpenditureResponseDto?> GetByIdAsync(long id)
         {
-            
-            var expenditure = await _expenditureRepository.GetByIdAsync(id);
 
-            if (expenditure == null || !expenditure.IsActive)
+            var expenditure = await _expenditureRepository
+                    .Where(x => x.Id == id && x.IsActive)
+                    .Include(x => x.Status)
+                    .Include(x => x.ApprovedBy)
+                    .FirstOrDefaultAsync();
+
+
+            if (expenditure == null)
                 return null;
 
             var role = _userAccessor.GetUserRole();

@@ -31,23 +31,24 @@ namespace ExpenseManagementSystem.Persistence.Services
 
 
             var sql = @"
-               SELECT 
-                    e.""Description"" AS ExpenseTitle,
-                    c.""Name"" AS CategoryName,
-                    e.""SubmissionDate"" AS ExpenseDate,
-                    e.""Total"" AS TotalAmount,
-                    s.""Name"" AS Status,
-                    ex.""Description"" AS Description,
-                    ex.""Amount"" AS Amount,
-                    ex.""IsApprovedForPayment"" AS IsApproved,
-                    ex.""CreatedDate"" AS CreatedDate
-               FROM ""table"".""Expenses"" e
-               JOIN ""table"".""Categories"" c ON e.""CategoryId"" = c.""Id""
-               JOIN ""table"".""ExpenseStatuses"" s ON e.""StatusId"" = s.""Id""
-               LEFT JOIN ""table"".""Expenditures"" ex ON ex.""ExpenseId"" = e.""Id""
-               WHERE (@Role = 'Admin' OR e.""UserId"" = @UserId)
-               ORDER BY e.""SubmissionDate"" DESC;
+                SELECT 
+                    ""ExpenseId"",
+                    ""UserId"",
+                    ""ExpenseTitle"",
+                    ""CategoryName"",
+                    ""ExpenseDate"",
+                    ""TotalAmount"",
+                    ""Status"",
+                    ""ExpenditureId"",
+                    ""ExpenditureDescription"",
+                    ""Amount"",
+                    ""StatusId"",
+                    ""CreatedDate""
+                FROM ""vw_personal_expense_report""
+                WHERE (@Role = 'Admin' OR ""UserId"" = @UserId)
+                ORDER BY ""ExpenseDate"" DESC;
             ";
+
 
             using var connection = CreateConnection();
             var lookup = new Dictionary<string, UserExpenseReportDto>();
@@ -69,7 +70,7 @@ namespace ExpenseManagementSystem.Persistence.Services
                     return reportDto;
                 },
                 new { UserId = userId, Role = role },
-                splitOn: "Description"
+                splitOn: "ExpenditureId"
             );
 
             return lookup.Values;
@@ -78,60 +79,33 @@ namespace ExpenseManagementSystem.Persistence.Services
 
         public async Task<List<PaymentDensityDto>> GetPaymentDensityAsync(string type)
         {
-            var dateColumn = type switch
+            var viewName = type switch
             {
-                "daily" => "DATE(p.\"PaymentDate\")",
-                "weekly" => "DATE_TRUNC('week', p.\"PaymentDate\")",
-                "monthly" => "DATE_TRUNC('month', p.\"PaymentDate\")",
-                _ => throw new ArgumentException("Invalid type", nameof(type))
+                "daily" => "\"vw_payment_density_daily\"",
+                "weekly" => "\"vw_payment_density_weekly\"",
+                "monthly" => "\"vw_payment_density_monthly\"",
+                _ => throw new ArgumentException("Geçersiz zaman tipi", nameof(type))
             };
 
-            var query = $@"
-                SELECT 
-                    {dateColumn} AS Date,
-                    SUM(p.""Amount"") AS TotalAmount,
-                    COUNT(p.""Id"") AS PaymentCount,
-                    u.""FirstName"" || ' ' || u.""LastName"" AS EmployeeName,
-                    a.""FirstName"" || ' ' || a.""LastName"" AS ApproverName,
-                    c.""Name"" AS CategoryName
-                FROM ""table"".""Payments"" p
-                JOIN ""table"".""Expenditures"" ex ON p.""ExpenditureId"" = ex.""Id""
-                JOIN ""table"".""Expenses"" e ON ex.""ExpenseId"" = e.""Id""
-                JOIN ""table"".""Users"" u ON e.""UserId"" = u.""Id""
-                LEFT JOIN ""table"".""Users"" a ON e.""ApprovedById"" = a.""Id""
-                JOIN ""table"".""Categories"" c ON ex.""CategoryId"" = c.""Id""
-                GROUP BY Date, EmployeeName, ApproverName, CategoryName
-                ORDER BY Date;
-            ";
+            var sql = $"SELECT * FROM {viewName}";
 
             using var connection = CreateConnection();
-            var result = await connection.QueryAsync<PaymentDensityDto>(query);
+            var result = await connection.QueryAsync<PaymentDensityDto>(sql);
             return result.ToList();
         }
 
 
         public async Task<List<UserExpenditureDensityDto>> GetUserExpenditureDensityAsync(string type)
         {
-            var dateColumn = type switch
+            var viewName = type switch
             {
-                "daily" => "DATE(ex.\"Date\")",
-                "weekly" => "DATE_TRUNC('week', ex.\"Date\")",
-                "monthly" => "DATE_TRUNC('month', ex.\"Date\")",
-                _ => throw new ArgumentException("Invalid type", nameof(type))
+                "daily" => "\"vw_user_expenditure_density_daily\"",
+                "weekly" => "\"vw_user_expenditure_density_weekly\"",
+                "monthly" => "\"vw_user_expenditure_density_monthly\"",
+                _ => throw new ArgumentException("Geçersiz zaman tipi", nameof(type))
             };
 
-            var query = $@"
-                SELECT 
-                    {dateColumn} AS Date,
-                    u.""FirstName"" || ' ' || u.""LastName"" AS UserName,
-                    SUM(ex.""Amount"") AS TotalAmount,
-                    COUNT(ex.""Id"") AS ExpenditureCount
-                FROM ""table"".""Expenditures"" ex
-                JOIN ""table"".""Expenses"" e ON ex.""ExpenseId"" = e.""Id""
-                JOIN ""table"".""Users"" u ON e.""UserId"" = u.""Id""
-                GROUP BY {dateColumn}, UserName
-                ORDER BY {dateColumn};
-            ";
+            var query = $"SELECT * FROM {viewName}";
 
             using var connection = CreateConnection();
             var result = await connection.QueryAsync<UserExpenditureDensityDto>(query);
@@ -139,5 +113,22 @@ namespace ExpenseManagementSystem.Persistence.Services
         }
 
 
+        public async Task<List<ExpenseApprovalSummaryDto>> GetApprovalSummaryAsync(string type)
+        {
+            var viewName = type switch
+            {
+                "daily" => "\"vw_expenditure_approval_daily_summary\"",
+                "weekly" => "\"vw_expenditure_approval_weekly_summary\"",
+                "monthly" => "\"vw_expenditure_approval_monthly_summary\"",
+                _ => throw new ArgumentException("Geçersiz zaman tipi", nameof(type))
+            };
+
+            var sql = $@"SELECT * FROM {viewName}";
+
+            using var connection = CreateConnection();
+            var result = await connection.QueryAsync<ExpenseApprovalSummaryDto>(sql);
+            return result.ToList();
+
+        }
     }
 }

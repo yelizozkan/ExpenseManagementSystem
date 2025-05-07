@@ -15,7 +15,12 @@ namespace ExpenseManagementSystem.Persistence.Configurations
                 .HasMaxLength(50);
 
             builder.Property(x => x.Description)
-                .HasMaxLength(250);
+            .HasMaxLength(250);
+
+            builder.HasMany(x => x.Expenses);    
+
+            builder.HasMany(x => x.Expenditures);
+
         }
     }
 }

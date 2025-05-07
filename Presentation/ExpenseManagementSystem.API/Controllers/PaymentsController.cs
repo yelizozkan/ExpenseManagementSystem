@@ -65,6 +65,5 @@ namespace ExpenseManagementSystem.API.Controllers
             return Ok(result);
         }
 
-
     }
 }

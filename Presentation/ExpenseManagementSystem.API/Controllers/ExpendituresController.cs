@@ -77,22 +77,32 @@ namespace ExpenseManagementSystem.API.Controllers
                 : new ApiResponse("Harcama kaydı bulunamadı veya zaten silinmiş", false);
         }
 
-
+        
+        [HttpPost("{id}/approve")]
         [Authorize(Roles = "Admin")]
-        [HttpPost("expenditures/{id}/approve-payment")]
-        public async Task<IActionResult> ApproveExpenditureForPayment(long id)
+        public async Task<IActionResult> Approve(long id, [FromBody] ApproveExpenditureCommand command)
         {
-            var result = await _mediator.Send(new ApproveExpenditureCommand(id));
-            return Ok(result);
+            if (id <= 0)
+                return BadRequest("Geçersiz ID");
+
+            command.Id = id;
+
+            var result = await _mediator.Send(command);
+            return Ok(new ApiResponse<ExpenditureResponseDto>(result));
         }
 
 
-        [HttpPut("{id}/reject-payment")]
+        [HttpPost("{id}/reject")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> RejectExpenditureForPayment(long id)
+        public async Task<IActionResult> Reject(long id, [FromBody] RejectExpenditureCommand command)
         {
-            var result = await _mediator.Send(new RejectExpenditureCommand(id));
-            return Ok(result);
+            if (id <= 0)
+                return BadRequest("Geçersiz ID");
+
+            command.Id = id;
+
+            var result = await _mediator.Send(command);
+            return Ok(new ApiResponse<ExpenditureResponseDto>(result));
         }
 
     }

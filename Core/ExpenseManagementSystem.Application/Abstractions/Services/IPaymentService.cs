@@ -1,4 +1,5 @@
 ﻿using ExpenseManagementSystem.Application.Dtos.Payment;
+using ExpenseManagementSystem.Application.Responses;
 
 namespace ExpenseManagementSystem.Application.Abstractions.Services
 {
@@ -6,6 +7,6 @@ namespace ExpenseManagementSystem.Application.Abstractions.Services
     {
         Task<PaymentResponseDto> CreateAsync(PaymentRequestDto model);
         Task<PaymentResponseDto> UpdateAsync(long id, PaymentRequestDto model);
-        Task<bool> DeleteAsync(long id);
+        Task<ApiResponse<string>> DeleteAsync(long id);
     }
 }

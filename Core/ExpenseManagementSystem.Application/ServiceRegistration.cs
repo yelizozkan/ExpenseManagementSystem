@@ -8,10 +8,8 @@ using ExpenseManagementSystem.Application.Features.Expenditures.Commands.Approve
 using ExpenseManagementSystem.Application.Features.Expenditures.Commands.CreateExpenditure;
 using ExpenseManagementSystem.Application.Features.Expenditures.Commands.DeleteExpenditure;
 using ExpenseManagementSystem.Application.Features.Expenditures.Commands.UpdateExpenditure;
-using ExpenseManagementSystem.Application.Features.Expenses.Commands.ApproveExpense;
 using ExpenseManagementSystem.Application.Features.Expenses.Commands.CreateExpense;
 using ExpenseManagementSystem.Application.Features.Expenses.Commands.DeleteExpense;
-using ExpenseManagementSystem.Application.Features.Expenses.Commands.RejectExpense;
 using ExpenseManagementSystem.Application.Features.Expenses.Commands.UpdateExpense;
 using ExpenseManagementSystem.Application.Features.ExpenseStatuses.Commands.CreateExpenseStatus;
 using ExpenseManagementSystem.Application.Features.Payments.Commands.CreatePayment;

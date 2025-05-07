@@ -8,6 +8,8 @@ namespace ExpenseManagementSystem.Application.Features.Expenditures.Commands.App
         public ApproveExpenditureCommandValidator()
         {
             RuleFor(x => x.Id).GreaterThan(0);
+
+            RuleFor(x => x.ApprovalNote).MaximumLength(300);
         }
     }
 }

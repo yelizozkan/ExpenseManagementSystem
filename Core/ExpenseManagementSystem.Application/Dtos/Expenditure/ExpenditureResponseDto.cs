@@ -12,7 +12,12 @@
         public string ReceiptFilePath { get; set; }
         public string ReceiptNumber { get; set; }
         public long? PaymentId { get; set; }
-        public bool? IsApprovedForPayment { get; set; }
+        public long StatusId { get; set; }
+        public string StatusName { get; set; }
+        public DateTime? ApprovalDate { get; set; }
+        public string? ApprovalNote { get; set; }
+        public long? ApprovedById { get; set; }
+        public string? ApprovedByName { get; set; }
         public bool IsActive { get; set; }
     }
 }

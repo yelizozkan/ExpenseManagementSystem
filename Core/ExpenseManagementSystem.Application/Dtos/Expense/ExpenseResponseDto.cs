@@ -12,9 +12,6 @@ namespace ExpenseManagementSystem.Application.Dtos.Expense
         public string? Description { get; set; }
         public long StatusId { get; set; }
         public string StatusName { get; set; }
-        public DateTime? ApprovalDate { get; set; }
-        public long? ApprovedById { get; set; }
-        public string? ApprovalNote { get; set; }
         public decimal Total { get; set; }
         public List<ExpenditureResponseDto>? Expenditures { get; set; }
 

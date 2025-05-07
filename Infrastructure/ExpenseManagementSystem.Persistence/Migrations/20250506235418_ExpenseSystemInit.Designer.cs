@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ExpenseManagementSystem.Persistence.Migrations
 {
     [DbContext(typeof(ExpenseManagementSystemDbContext))]
-    [Migration("20250505130616_MakeUserFieldsNullable")]
-    partial class MakeUserFieldsNullable
+    [Migration("20250506235418_ExpenseSystemInit")]
+    partial class ExpenseSystemInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,38 +75,38 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 347, DateTimeKind.Utc).AddTicks(8760),
-                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            CreatedDate = new DateTime(2025, 5, 6, 23, 54, 18, 82, DateTimeKind.Utc).AddTicks(5161),
+                            CreatedDateOnly = new DateOnly(2025, 5, 6),
                             Description = "Business travel and transportation",
                             IsActive = true,
                             IsDeleted = false,
                             Name = "Travel",
-                            UpdatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 347, DateTimeKind.Utc).AddTicks(8765),
-                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                            UpdatedDate = new DateTime(2025, 5, 6, 23, 54, 18, 82, DateTimeKind.Utc).AddTicks(5170),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 6)
                         },
                         new
                         {
                             Id = 2L,
-                            CreatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 347, DateTimeKind.Utc).AddTicks(8771),
-                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            CreatedDate = new DateTime(2025, 5, 6, 23, 54, 18, 82, DateTimeKind.Utc).AddTicks(5180),
+                            CreatedDateOnly = new DateOnly(2025, 5, 6),
                             Description = "Food and beverages during work",
                             IsActive = true,
                             IsDeleted = false,
                             Name = "Meals",
-                            UpdatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 347, DateTimeKind.Utc).AddTicks(8771),
-                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                            UpdatedDate = new DateTime(2025, 5, 6, 23, 54, 18, 82, DateTimeKind.Utc).AddTicks(5181),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 6)
                         },
                         new
                         {
                             Id = 3L,
-                            CreatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 347, DateTimeKind.Utc).AddTicks(8774),
-                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            CreatedDate = new DateTime(2025, 5, 6, 23, 54, 18, 82, DateTimeKind.Utc).AddTicks(5184),
+                            CreatedDateOnly = new DateOnly(2025, 5, 6),
                             Description = "Stationery and work materials",
                             IsActive = true,
                             IsDeleted = false,
                             Name = "Office Supplies",
-                            UpdatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 347, DateTimeKind.Utc).AddTicks(8774),
-                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                            UpdatedDate = new DateTime(2025, 5, 6, 23, 54, 18, 82, DateTimeKind.Utc).AddTicks(5184),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 6)
                         });
                 });
 
@@ -120,6 +120,16 @@ namespace ExpenseManagementSystem.Persistence.Migrations
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ApprovalDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ApprovalNote")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<long?>("ApprovedById")
+                        .HasColumnType("bigint");
 
                     b.Property<long>("CategoryId")
                         .HasColumnType("bigint");
@@ -162,6 +172,9 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<long>("StatusId")
+                        .HasColumnType("bigint");
+
                     b.Property<decimal>("TaxAmount")
                         .HasColumnType("decimal(18,2)");
 
@@ -176,9 +189,13 @@ namespace ExpenseManagementSystem.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApprovedById");
+
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("ExpenseId");
+
+                    b.HasIndex("StatusId");
 
                     b.ToTable("Expenditures", "table");
                 });
@@ -190,16 +207,6 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime?>("ApprovalDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ApprovalNote")
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<long?>("ApprovedById")
-                        .HasColumnType("bigint");
 
                     b.Property<long>("CategoryId")
                         .HasColumnType("bigint");
@@ -245,8 +252,6 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("CategoryId");
 
@@ -306,38 +311,38 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 205, DateTimeKind.Utc).AddTicks(5109),
-                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            CreatedDate = new DateTime(2025, 5, 6, 23, 54, 17, 959, DateTimeKind.Utc).AddTicks(4694),
+                            CreatedDateOnly = new DateOnly(2025, 5, 6),
                             Description = "Expense is waiting for approval",
                             IsActive = true,
                             IsDeleted = false,
                             Name = "Pending",
-                            UpdatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 205, DateTimeKind.Utc).AddTicks(5112),
-                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                            UpdatedDate = new DateTime(2025, 5, 6, 23, 54, 17, 959, DateTimeKind.Utc).AddTicks(4698),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 6)
                         },
                         new
                         {
                             Id = 2L,
-                            CreatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 205, DateTimeKind.Utc).AddTicks(5119),
-                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            CreatedDate = new DateTime(2025, 5, 6, 23, 54, 17, 959, DateTimeKind.Utc).AddTicks(4708),
+                            CreatedDateOnly = new DateOnly(2025, 5, 6),
                             Description = "Expense has been approved",
                             IsActive = true,
                             IsDeleted = false,
                             Name = "Approved",
-                            UpdatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 205, DateTimeKind.Utc).AddTicks(5119),
-                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                            UpdatedDate = new DateTime(2025, 5, 6, 23, 54, 17, 959, DateTimeKind.Utc).AddTicks(4708),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 6)
                         },
                         new
                         {
                             Id = 3L,
-                            CreatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 205, DateTimeKind.Utc).AddTicks(5121),
-                            CreatedDateOnly = new DateOnly(2025, 5, 5),
+                            CreatedDate = new DateTime(2025, 5, 6, 23, 54, 17, 959, DateTimeKind.Utc).AddTicks(4710),
+                            CreatedDateOnly = new DateOnly(2025, 5, 6),
                             Description = "Expense has been rejected",
                             IsActive = true,
                             IsDeleted = false,
                             Name = "Rejected",
-                            UpdatedDate = new DateTime(2025, 5, 5, 13, 6, 15, 205, DateTimeKind.Utc).AddTicks(5121),
-                            UpdatedDateOnly = new DateOnly(2025, 5, 5)
+                            UpdatedDate = new DateTime(2025, 5, 6, 23, 54, 17, 959, DateTimeKind.Utc).AddTicks(4710),
+                            UpdatedDateOnly = new DateOnly(2025, 5, 6)
                         });
                 });
 
@@ -400,7 +405,6 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("DepartmentName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
@@ -415,7 +419,6 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Iban")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("LastName")
@@ -446,7 +449,6 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Position")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("RefreshToken")
@@ -481,7 +483,7 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         {
                             Id = 1L,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a6573ac3-b245-41fe-b253-877c1bbe807f",
+                            ConcurrencyStamp = "83b82586-b020-45ab-ab50-0fbfbcad65ec",
                             DepartmentName = "Management",
                             Email = "admin@company.com",
                             EmailConfirmed = true,
@@ -491,10 +493,10 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@COMPANY.COM",
                             NormalizedUserName = "ADMIN@COMPANY.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOAQi1ZpMTuAa7x+aoJpIczMDD36AxNsTrQ3xrlz0YbF92yUZUGsfgye/BYCDDG1dA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFF5ZYQ3XTT3f/Al+VmHbVvULpq2pTGDjA0fHaTM44d3d1JeKOPrOBU0BZqSbtSOaA==",
                             PhoneNumberConfirmed = false,
                             Position = "Admin",
-                            SecurityStamp = "075f12f9-bce8-4966-a591-a295eca56b8c",
+                            SecurityStamp = "17ef8889-5743-4989-bde2-fcc78efc5636",
                             TwoFactorEnabled = false,
                             UserName = "admin@company.com"
                         },
@@ -502,7 +504,7 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         {
                             Id = 2L,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "475d7d14-af2a-4f8c-b877-805034aac42f",
+                            ConcurrencyStamp = "d1e0a13d-ea5b-4eb8-9c12-40879d0868d6",
                             DepartmentName = "Muhasebe",
                             Email = "personel@company.com",
                             EmailConfirmed = true,
@@ -512,10 +514,10 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "PERSONEL@COMPANY.COM",
                             NormalizedUserName = "PERSONEL@COMPANY.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHpoyQXzBAV9ofOlqpwm7t7NmkZLTt/+WzcfCCfakKxZphv9dpwVMQ2KKh6FgmM3KQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGH7pvi5TRnOLA1Er6sfpc8xLxr9J+Hz/JDn2QYAQvj0sf9zThEN3Q0PSDy2D4j+gw==",
                             PhoneNumberConfirmed = false,
                             Position = "Personel",
-                            SecurityStamp = "b1c9cf4c-fb77-4aef-a39c-c2dda24c93ee",
+                            SecurityStamp = "8150ba94-aaed-4896-beea-55795f4e4e74",
                             TwoFactorEnabled = false,
                             UserName = "personel@company.com"
                         });
@@ -692,6 +694,11 @@ namespace ExpenseManagementSystem.Persistence.Migrations
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Expenditure", b =>
                 {
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("ExpenseManagementSystem.Domain.Entities.Category", "Category")
                         .WithMany("Expenditures")
                         .HasForeignKey("CategoryId")
@@ -704,18 +711,23 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ExpenseManagementSystem.Domain.Entities.ExpenseStatus", "Status")
+                        .WithMany("Expenditures")
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApprovedBy");
+
                     b.Navigation("Category");
 
                     b.Navigation("Expense");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.Expense", b =>
                 {
-                    b.HasOne("ExpenseManagementSystem.Domain.Entities.Identity.AppUser", "ApprovedBy")
-                        .WithMany()
-                        .HasForeignKey("ApprovedById")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("ExpenseManagementSystem.Domain.Entities.Category", "Category")
                         .WithMany("Expenses")
                         .HasForeignKey("CategoryId")
@@ -733,8 +745,6 @@ namespace ExpenseManagementSystem.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("ApprovedBy");
 
                     b.Navigation("Category");
 
@@ -824,6 +834,8 @@ namespace ExpenseManagementSystem.Persistence.Migrations
 
             modelBuilder.Entity("ExpenseManagementSystem.Domain.Entities.ExpenseStatus", b =>
                 {
+                    b.Navigation("Expenditures");
+
                     b.Navigation("Expenses");
                 });
 
