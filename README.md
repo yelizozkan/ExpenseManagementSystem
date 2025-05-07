@@ -23,7 +23,7 @@
 ## 📊 Veritabanı Diyagramı
 
 
-![Veritabanı Diyagramı](./UMLDiagram.png)
+![Veritabanı Diyagramı](./images/UMLDiagram.png)
 
 ---
 
@@ -32,12 +32,20 @@
 Projeyi çalıştırmak için aşağıdaki adımları izleyin:
 
 1. Bu repoyu klonlayın.
-2. appsettings.Development.json dosyası içerisindeki *Postgre SQL bağlantı dizesini* kendi local bağlantınızla değiştirin.
-3. WebAPI projesine sağ tıklayarak *Set as Startup Project* seçeneğini seçin.
-4. *Package Manager Console’u açın ve **Default Project* alanını Persistence olarak ayarlayın.
+2. appsettings.Development.json dosyası içerisindeki *PostgreSQL  bağlantı dizesini* kendi local bağlantınızla değiştirin.
+3. ExpenseManagementSystem.WebAPI projesine sağ tıklayarak *Set as Startup Project* seçeneğini seçin.
+4. *Package Manager Console’u açın ve **Default Project* alanını ExpenseManagementSystem.Persistence olarak ayarlayın.
 5. Aşağıdaki komutu çalıştırarak veritabanını oluşturun:
 
    ```bash
    update-database
+6. Projeyi çalıştırın ve Swagger arayüzü üzerinden API uç noktalarını test edin.
 
+   
+   ## 👥 Rollere Göre Yetkilendirme
+
+| Rol      | Yetkiler                                                            |
+|----------|---------------------------------------------------------------------|
+| **Admin**    | Tüm kullanıcıların işlemlerini görme, masraf onayı, ödeme, ödeme takibi |
+| **Personel** | Kendi masraflarını görüntüleme ve yeni masraf girişi yapma       |
    
