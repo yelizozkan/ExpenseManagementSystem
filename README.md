@@ -23,7 +23,7 @@
 ## 📊 Veritabanı Diyagramı
 
 
-![Veritabanı Diyagramı](./path-to-diagram.png)
+![Veritabanı Diyagramı](./UMLDiagram.png)
 
 ---
 
